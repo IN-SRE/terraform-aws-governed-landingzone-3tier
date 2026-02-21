@@ -12,12 +12,7 @@ variable "aws_instance_type" {
   default = "t2.micro"
 }
 
-/* # AWS instance type
-variable "aws_instancetype_list" {
-description = "AWS instance type"
-type = list(string)
-default = [ "t2.micro", "t3.micro" ]
-} */
+
 
 # AWS instance type
 /*variable "aws_instancetype_map" {
