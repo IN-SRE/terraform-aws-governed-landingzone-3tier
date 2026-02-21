@@ -1,6 +1,6 @@
 module "vpc-project1" {
-    source = "terraform-aws-modules/vpc/aws"
-    version = "6.6.0"
+    source = "git::https://github.com/IN-SRE/terraform-aws-infrastructure-modules.git//vpc?ref=v1.0.0"
+    
     
     name = "${local.name}-vpc"
     
