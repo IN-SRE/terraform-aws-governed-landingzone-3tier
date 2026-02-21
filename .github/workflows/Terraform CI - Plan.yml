@@ -17,14 +17,14 @@ jobs:
 
       # 1. Initialize with backend-config for the specific environment
       - name: Terraform Init
-        working-directory: environments/${{ matrix.env }}
+        working-directory: envs/${{ matrix.env }}
         run: |
           terraform init
 
       # 2. Plan with the specific .tfvars file
       - name: Terraform Plan
         id: plan
-        working-directory: environments/${{ matrix.env }}
+        working-directory: envs/${{ matrix.env }}
         run: |
           terraform plan -no-color \
             -var-file="${{ matrix.env }}.tfvars" \
