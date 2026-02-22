@@ -32,7 +32,7 @@ jobs:
         working-directory: envs/dev
         run: |
           terraform init \
-          -backend-config="backend.config" \
+          -backend-config="${{ github.workspace }}/backend.config" \
           -backend-config="key=pipeline-test/dev/terraform.tfstate"
           
       - name: Terraform Apply
