@@ -32,8 +32,8 @@ jobs:
         working-directory: envs/dev
         run: |
           terraform init \
-          -backend-config="${{ github.workspace }}/global/backend.config" \
-          -backend-config="key=pipeline-test/${{ matrix.env }}/terraform.tfstate"
+          -backend-config="../../global/backend.config" \
+          -backend-config="key=pipeline-test/dev/terraform.tfstate"
           terraform apply -auto-approve -var-file="dev.tfvars"
 
   deploy-qa:
@@ -58,8 +58,8 @@ jobs:
         working-directory: envs/qa
         run: |
           terraform init \
-          -backend-config="${{ github.workspace }}/global/backend.config" \
-          -backend-config="key=pipeline-test/${{ matrix.env }}/terraform.tfstate"
+          -backend-config="../../global/backend.config" \
+          -backend-config="key=pipeline-test/qa/terraform.tfstate"
           terraform apply -auto-approve -var-file="qa.tfvars"
 
   deploy-stage:
@@ -84,8 +84,8 @@ jobs:
         working-directory: envs/stage
         run: |
           terraform init \
-          -backend-config="${{ github.workspace }}/global/backend.config" \
-          -backend-config="key=pipeline-test/${{ matrix.env }}/terraform.tfstate"
+          -backend-config="../../global/backend.config" \
+          -backend-config="key=pipeline-test/stage/terraform.tfstate"
           terraform apply -auto-approve -var-file="stage.tfvars"
 
   deploy-prod:
@@ -110,6 +110,6 @@ jobs:
         working-directory: environments/prod
         run: |
           terraform init \
-          -backend-config="${{ github.workspace }}/global/backend.config" \
-          -backend-config="key=pipeline-test/${{ matrix.env }}/terraform.tfstate"
+          -backend-config="../../global/backend.config" \
+          -backend-config="key=pipeline-test/prod/terraform.tfstate"
           terraform apply -auto-approve -var-file="prod.tfvars"
