@@ -44,7 +44,7 @@ jobs:
         run: |
           terraform init \
             -backend-config="${{ github.workspace }}/global/backend.config" \
-            -backend-config="key=3tier/${{ github.event.inputs.env }}/terraform.tfstate"
+            -backend-config="key=pipeline-test/${{ github.event.inputs.env }}/terraform.tfstate"
 
       - name: Terraform Destroy
         working-directory: envs/${{ github.event.inputs.env }}
