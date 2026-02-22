@@ -8,4 +8,3 @@ locals {
     Enviornment = local.environment
   }
 }
-# test
