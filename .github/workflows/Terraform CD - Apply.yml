@@ -36,8 +36,8 @@ jobs:
           -backend-config="key=pipeline-test/dev/terraform.tfstate"
           
       - name: Terraform Apply
-        working-directory: envs/${{ matrix.env }}
-        run: terraform apply -auto-approve -var-file="${{ matrix.env }}.tfvars"
+        working-directory: envs/dev
+        run: terraform apply -auto-approve -var-file="dev.tfvars"
        
   deploy-qa:
     name: Apply QA
