@@ -37,7 +37,9 @@ jobs:
       - name: Terraform Init
         working-directory: envs/${{ matrix.env }}
         run: |
-          terraform init
+          terraform init \
+          -backend-config="../../global/backend.config" \
+          -backend-config="key=pipeline-test/${{ matrix.env }}/terraform.tfstate"
 
       # 2. Plan with the specific .tfvars file
       - name: Terraform Plan
