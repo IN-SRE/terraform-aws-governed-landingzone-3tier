@@ -61,7 +61,7 @@ jobs:
         working-directory: envs/qa
         run: |
           terraform init \
-          -backend-config="../../global/backend.config" \
+          -backend-config="${{ github.workspace }}/global/backend.config" \
           -backend-config="key=pipeline-test/qa/terraform.tfstate"
           terraform apply -auto-approve -var-file="qa.tfvars"
 
@@ -87,7 +87,7 @@ jobs:
         working-directory: envs/stage
         run: |
           terraform init \
-          -backend-config="../../global/backend.config" \
+          -backend-config="${{ github.workspace }}/global/backend.config" \
           -backend-config="key=pipeline-test/stage/terraform.tfstate"
           terraform apply -auto-approve -var-file="stage.tfvars"
 
@@ -113,6 +113,6 @@ jobs:
         working-directory: environments/prod
         run: |
           terraform init \
-          -backend-config="../../global/backend.config" \
+          -backend-config="${{ github.workspace }}/global/backend.config" \
           -backend-config="key=pipeline-test/prod/terraform.tfstate"
           terraform apply -auto-approve -var-file="prod.tfvars"
