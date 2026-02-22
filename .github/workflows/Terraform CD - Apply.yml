@@ -37,7 +37,7 @@ jobs:
           
       - name: Terraform Apply
         working-directory: envs/${{ matrix.env }}
-        run: terraform apply -auto-approve -var-file="dev.tfvars"
+        run: terraform apply -auto-approve -var-file="${{ matrix.env }}.tfvars"
        
   deploy-qa:
     name: Apply QA
