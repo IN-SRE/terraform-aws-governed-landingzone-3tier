@@ -1,0 +1,107 @@
+name: "Terraform CD - Apply"
+
+on:
+  push:
+    branches: [main]
+    paths: ["envs/**"]
+
+# Required for OIDC and PR interaction
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy-dev:
+    name: Apply Dev
+    environment: dev
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::473833401550:role/github-terraform-dev-role
+          aws-region: us-east-1
+          
+      - name: Terraform install
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.13.5
+      - name: Terraform Init & Apply
+        working-directory: envs/dev
+        run: |
+          terraform init -backend-config=backend.config
+          terraform apply -auto-approve -var-file="dev.tfvars"
+
+  deploy-qa:
+    name: Apply QA
+    needs: deploy-dev  # <--- STOP CIRCUIT: Only runs if Dev succeeds
+    environment: qa
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::473833401550:role/github-terraform-dev-role
+          aws-region: us-east-1
+          
+      - name: Terraform install
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.13.5
+      - name: Terraform Init & Apply
+        working-directory: envs/qa
+        run: |
+          terraform init -backend-config=backend.config
+          terraform apply -auto-approve -var-file="qa.tfvars"
+
+  deploy-stage:
+    name: Apply Stage
+    needs: deploy-qa   # <--- STOP CIRCUIT: Only runs if QA succeeds
+    environment: stage  # stop wait for QA lead approval
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+       - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::473833401550:role/github-terraform-dev-role
+          aws-region: us-east-1
+          
+      - name: Terraform install
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.13.5
+      - name: Terraform Init & Apply
+        working-directory: envs/stage
+        run: |
+          terraform init -backend-config=backend.config
+          terraform apply -auto-approve -var-file="stage.tfvars"
+
+  deploy-prod:
+    name: Apply Prod
+    needs: deploy-stage # <--- FINAL GATE: Only reached if Dev, QA, and Stage pass
+    environment: prod   # Gated by Manual Approval in GitHub Settings
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::473833401550:role/github-terraform-dev-role
+          aws-region: us-east-1
+          
+      - name: Terraform install
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.13.5
+      - name: Terraform Init & Apply
+        working-directory: environments/prod
+        run: |
+          terraform init -backend-config=backend.config
+          terraform apply -auto-approve -var-file="prod.tfvars"
