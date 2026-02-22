@@ -1,0 +1,53 @@
+name: "Terraform - Manual Destroy"
+
+on:
+  workflow_dispatch:
+    inputs:
+      env:
+        description: 'Select Environment to Destroy'
+        required: true
+        type: choice
+        options:
+          - dev
+          - qa
+          - stage
+          - prod
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  destroy:
+    name: Destroy ${{ github.event.inputs.env }}
+    runs-on: ubuntu-latest
+    # This ensures it still waits for approval on Stage/Prod
+    environment: ${{ github.event.inputs.env }}
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: Terraform Install
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.13.5
+
+      - name: Terraform Init
+        working-directory: envs/${{ github.event.inputs.env }}
+        run: |
+          terraform init \
+            -backend-config="${{ github.workspace }}/global/backend.config" \
+            -backend-config="key=3tier/${{ github.event.inputs.env }}/terraform.tfstate"
+
+      - name: Terraform Destroy
+        working-directory: envs/${{ github.event.inputs.env }}
+        run: |
+          terraform destroy -auto-approve \
+            -var-file="${{ github.workspace }}/envs/${{ github.event.inputs.env }}/${{ github.event.inputs.env }}.tfvars"
