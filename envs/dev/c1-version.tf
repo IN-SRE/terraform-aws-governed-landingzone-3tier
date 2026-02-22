@@ -9,10 +9,7 @@
     }
   }
    backend "s3" {
-    bucket       = "terraform-on-aws-for-ec2-inder"
-    key          =  "pipeline-test/dev/terraform.tfstate"
-    use_lockfile = true
-    region       = "us-east-1"
+   # DO NOT put any values here. 
   }
     
   }
