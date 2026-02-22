@@ -14,6 +14,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.3.5
 
       # 1. Initialize with backend-config for the specific environment
       - name: Terraform Init
