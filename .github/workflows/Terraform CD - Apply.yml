@@ -34,8 +34,11 @@ jobs:
           terraform init \
           -backend-config="../../global/backend.config" \
           -backend-config="key=pipeline-test/dev/terraform.tfstate"
-          terraform apply -auto-approve -var-file="dev.tfvars"
-
+          
+      - name: Terraform Apply
+        working-directory: envs/${{ matrix.env }}
+        run: terraform apply -auto-approve -var-file="dev.tfvars"
+       
   deploy-qa:
     name: Apply QA
     needs: deploy-dev  # <--- STOP CIRCUIT: Only runs if Dev succeeds
