@@ -110,7 +110,7 @@ jobs:
         with:
           terraform_version: 1.13.5
       - name: Terraform Init & Apply
-        working-directory: environments/prod
+        working-directory: envs/prod
         run: |
           terraform init \
           -backend-config="${{ github.workspace }}/global/backend.config" \
