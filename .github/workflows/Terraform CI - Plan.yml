@@ -25,7 +25,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           # Replace with your IAM Role ARN (e.g., from a GitHub Secret or variable)
-          role-to-assume: arn:aws:iam::473833401550:role/github-terraform-dev-role
+          role-to-assume: arn:aws:iam::245111010647:role/github-terraform-dev-role
           aws-region: us-east-1 # Replace with your target region
           
       - name: Terraform install
