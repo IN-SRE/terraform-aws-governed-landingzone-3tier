@@ -36,7 +36,7 @@ jobs:
         working-directory: global-aws-landing-zones
         run: |
           terraform init \
-          -backend-config="../backend.config" \
+          -backend-config="backend.config" \
           -backend-config="key=aws-lz/terraform.tfstate"
 
       # 2. Plan with the specific .tfvars file
