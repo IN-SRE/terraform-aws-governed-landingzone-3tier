@@ -33,7 +33,7 @@ jobs:
         run: |
           terraform init \
           -backend-config="backend.config" \
-          -backend-config="aws-lz/terraform.tfstate"
+          -backend-config="key=aws-lz/terraform.tfstate"
           
       - name: Terraform Apply
         working-directory: global-aws-landing-zones
