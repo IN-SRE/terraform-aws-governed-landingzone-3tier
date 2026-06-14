@@ -1,4 +1,4 @@
-name: "Terraform - Manual Destroy"
+name: "aws-lz-plan-Manual Destroy"
 
 on:
   workflow_dispatch:
