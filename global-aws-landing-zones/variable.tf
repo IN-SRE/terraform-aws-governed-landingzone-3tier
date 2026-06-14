@@ -5,12 +5,6 @@ variable "aws_region" {
   default = "us-east-1"
 }
 
-# AWS instance type
-variable "aws_instance_type" {
-  description = "Ec2 Instance type"
-  type = string
-  default = "t2.micro"
-}
 
 
 
