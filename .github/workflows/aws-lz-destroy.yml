@@ -1,4 +1,4 @@
-name: "Terraform - Manual Destroy"
+name: "aws-lz-plan-Manual Destroy"
 
 on:
   workflow_dispatch:
@@ -40,14 +40,13 @@ jobs:
           terraform_version: 1.13.5
 
       - name: Terraform Init
-        working-directory: envs/${{ github.event.inputs.env }}
+        working-directory: global-aws-landing-zones
         run: |
           terraform init \
-            -backend-config="${{ github.workspace }}/global/backend.config" \
-            -backend-config="key=pipeline-test/${{ github.event.inputs.env }}/terraform.tfstate"
+            -backend-config="backend.config" \
+            -backend-config="key=aws-lz/terraform.tfstate"
 
       - name: Terraform Destroy
-        working-directory: envs/${{ github.event.inputs.env }}
+        working-directory: global-aws-landing-zones
         run: |
-          terraform destroy -auto-approve \
-            -var-file="${{ github.workspace }}/envs/${{ github.event.inputs.env }}/${{ github.event.inputs.env }}.tfvars"
+          terraform destroy -auto-approve 

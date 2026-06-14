@@ -1,8 +1,9 @@
-name: "Terraform CI - Plan"
+name: "AWS LZ Plan"
 
 on:
   pull_request:
-    paths: ["envs/**"]
+    branches: [main]
+    paths: ["global-aws-landing-zones/**"]
     
 # REQUIRED for OIDC authentication
 permissions:
@@ -12,10 +13,7 @@ permissions:
   
 jobs:
   plan:
-    name: Plan ${{ matrix.env }}
-    strategy:
-      matrix:
-        env: [dev, qa, stage, prod]
+    name: Plan aws-lz
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -35,19 +33,18 @@ jobs:
 
       # 1. Initialize with backend-config for the specific environment
       - name: Terraform Init
-        working-directory: envs/${{ matrix.env }}
+        working-directory: global-aws-landing-zones
         run: |
           terraform init \
-          -backend-config="../../global/backend.config" \
-          -backend-config="key=pipeline-test/${{ matrix.env }}/terraform.tfstate"
+          -backend-config="backend.config" \
+          -backend-config="key=aws-lz/terraform.tfstate"
 
       # 2. Plan with the specific .tfvars file
       - name: Terraform Plan
         id: plan
-        working-directory: envs/${{ matrix.env }}
+        working-directory: global-aws-landing-zones
         run: |
           terraform plan -no-color \
-            -var-file="${{ matrix.env }}.tfvars" \
             -out=tfplan
 
       # 3. Post plan output to PR Comment for easy review
@@ -56,7 +53,7 @@ jobs:
         if: github.event_name == 'pull_request'
         with:
           script: |
-            const output = `#### Terraform Plan: ${{ matrix.env }} 📖
+            const output = `#### Terraform Plan: aws-lz
             \`\`\`
             ${process.env.PLAN}
             \`\`\``;
