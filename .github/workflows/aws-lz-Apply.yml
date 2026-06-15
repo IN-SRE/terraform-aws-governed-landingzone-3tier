@@ -16,16 +16,16 @@ jobs:
     environment: prod
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v5
         with:
           role-to-assume: arn:aws:iam::245111010647:role/github-terraform-dev-role
           aws-region: us-east-1
           
       - name: Terraform install
-        uses: hashicorp/setup-terraform@v3
+        uses: hashicorp/setup-terraform@v4
         with:
           terraform_version: 1.13.5
       - name: Terraform Init & Apply
