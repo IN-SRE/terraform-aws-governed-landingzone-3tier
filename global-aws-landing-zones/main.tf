@@ -9,7 +9,7 @@ resource "aws_organizations_organization" "main" {
 # Security OU created for centralized governance of security and audit accounts
 resource "aws_organizations_organizational_unit" "security" {
   name      = "Security"
-  parent_id = aws_organizations_organization.org.roots[0].id
+  parent_id = aws_organizations_organization.main.roots[0].id
 }
 
 # Provision a dedicated Log Archive account to centralize organization-wide log storage and retention.

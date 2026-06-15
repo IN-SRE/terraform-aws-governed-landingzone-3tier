@@ -11,8 +11,7 @@ variable "log_archive" {
   description = "Email address for the AWS Organizations Log Archive account"
   validation {
     condition = can(regex(
-      "^[A-Za-z0-9._%+-]+@[A-Za-z]+\\.[A-Za-z]{2,}$",
-      var.log_archive_email
+      "^[A-Za-z0-9._%+-]+@[A-Za-z]+\\.[A-Za-z]{2,}$",var.log_archive
     ))
 
     error_message = "Email must be in valid format like john@gmail.com"
@@ -21,11 +20,10 @@ variable "log_archive" {
 
  variable "audit" {
   description = "Email address for the AWS Organizations audit account"
-
   validation {
     condition = can(regex(
-      "^[A-Za-z0-9._%+-]+@[A-Za-z]+\\.[A-Za-z]{2,}$",
-      var.log_archive_email
+      "^[A-Za-z0-9._%+-]+@[A-Za-z]+\\.[A-Za-z]{2,}$",var.audit
+      
     ))
 
     error_message = "Email must be in valid format like john@gmail.com"
