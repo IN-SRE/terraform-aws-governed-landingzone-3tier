@@ -7,6 +7,33 @@ variable "aws_region" {
 
 
 
+variable "log_archive" {
+  description = "Email address for the AWS Organizations Log Archive account"
+  validation {
+    condition = can(regex(
+      "^[A-Za-z0-9._%+-]+@[A-Za-z]+\\.[A-Za-z]{2,}$",
+      var.log_archive_email
+    ))
+
+    error_message = "Email must be in valid format like john@gmail.com"
+  }
+}
+
+ variable "audit" {
+  description = "Email address for the AWS Organizations audit account"
+
+  validation {
+    condition = can(regex(
+      "^[A-Za-z0-9._%+-]+@[A-Za-z]+\\.[A-Za-z]{2,}$",
+      var.log_archive_email
+    ))
+
+    error_message = "Email must be in valid format like john@gmail.com"
+  }
+
+}
+
+
 
 # AWS instance type
 /*variable "aws_instancetype_map" {
