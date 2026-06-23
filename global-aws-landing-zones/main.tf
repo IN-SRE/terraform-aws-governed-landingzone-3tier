@@ -6,6 +6,19 @@ resource "aws_organizations_organization" "main" {
   feature_set = "ALL"
 }
 
+# 
+import {
+  to = aws_organizations_organizational_unit.sandbox
+  identity = {
+    id = data.aws_organizations_organizational_unit.ou.id
+  }
+}
+
+resource "aws_organizations_organizational_unit" "sandbox" {
+  name = "Sandbox"
+  parent_id = aws_organizations_organization.main.roots[0].id
+}
+
 # Security OU created for centralized governance of security and audit accounts
 resource "aws_organizations_organizational_unit" "security" {
   name      = "Security"
@@ -28,4 +41,130 @@ resource "aws_organizations_account" "Audit" {
   iam_user_access_to_billing = "DENY"
   parent_id = aws_organizations_organizational_unit.security.id
   tags = local.common_tag
+}
+
+
+################################################################################
+# IAM Role
+################################################################################
+# AWSControlTowerAdmin
+
+resource "aws_iam_role" "aws_controltower_admin" {
+  name = "AWSControlTowerAdmin"
+  path = "/service-role/"
+  description = "Role used by AWS Control Tower to administer the landing zone." 
+
+  assume_role_policy = jsonencode(
+  {
+  "Version":"2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "controltower.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+})
+  tags = local.common_tag
+}
+
+# Inline Policy - AWSControlTowerAdminPolicy ; Permission specific only to this role
+
+resource "aws_iam_role_policy" "aws_controltower_admin_policy" {
+  name = "AWSControlTowerAdminPolicy"
+  role = aws_iam_role.aws_controltower_admin.id
+   policy = jsonencode({
+    "Version":"2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": "ec2:DescribeAvailabilityZones",
+            "Resource": "*"
+        }
+    ]
+})
+}
+
+resource "aws_iam_role_policy_attachment" "aws_controltower_service_role_policy" {
+
+  role = aws_iam_role.aws_controltower_admin.name
+
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSControlTowerServiceRolePolicy"
+}
+
+
+# AWS Control Tower CloudTrail Role
+
+resource "aws_iam_role" "aws_controltower_cloudtrail_role" {
+  name = "AWSControlTowerCloudTrailRole"
+  path = "/service-role/"
+  description = "Role used by CloudTrail to send logs to CloudWatch."
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "cloudtrail.amazonaws.com"
+        }
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+  tags = local.common_tag
+}
+
+# Attach AWS Managed Policy: AWSControlTowerCloudTrailRolePolicy
+
+resource "aws_iam_role_policy_attachment" "aws_controltower_cloudtrail_role_policy" {
+  role       = aws_iam_role.aws_controltower_cloudtrail_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSControlTowerCloudTrailRolePolicy"
+}
+
+
+# AWS Control Tower StackSet Role
+
+resource "aws_iam_role" "aws_controltower_stackset_role" {
+  name = "AWSControlTowerStackSetRole"
+  path = "/service-role/"
+  description = "Role used by CloudFormation StackSets to deploy resources across accounts."
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "cloudformation.amazonaws.com"
+        }
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+  tags = local.common_tag
+}
+
+# Inline Policy: Allow CloudFormation to assume AWSControlTowerExecution role
+
+resource "aws_iam_role_policy" "aws_controltower_stackset_role_policy" {
+  name = "AWSControlTowerStackSetRolePolicy"
+  role = aws_iam_role.aws_controltower_stackset_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "sts:AssumeRole"
+        ]
+        Resource = [
+          "arn:aws:iam::*:role/AWSControlTowerExecution"
+        ]
+      }
+    ]
+  })
 }
