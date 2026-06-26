@@ -11,7 +11,8 @@
             },
             "centralBackup": {
                 "accountId": "${common_account}"  
-            }
+            },
+             "kmsKeyArn": "${kms_key_arn}"
             
         }
     },
@@ -36,7 +37,8 @@
             },
             "loggingBucket": {
                 "retentionDays": 365    
-            }
+            },
+             "kmsKeyArn": "${kms_key_arn}"
            
         }
     },
