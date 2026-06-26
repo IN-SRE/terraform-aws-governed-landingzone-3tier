@@ -166,8 +166,23 @@ resource "aws_iam_role_policy" "aws_controltower_stackset_role_policy" {
 # Launch landing zone
 ################################################################################
 
+resource "aws_kms_key" "lz_kms" {
+  description             = "Landing Zone KMS key"
+  enable_key_rotation     = true
+  deletion_window_in_days = 7
+
+  tags = {
+    Name = "lz-kms"
+  }
+}
+
 resource "aws_controltower_landing_zone" "example" {
-  manifest_json     = templatefile("${path.module}/lz-gov-manifest.json", { common_account = data.aws_organizations_account.devop.account_id, log_archieve= aws_organizations_account.Log_archive.id, security_audit= aws_organizations_account.Audit.id})
+  manifest_json     = templatefile("${path.module}/lz-gov-manifest.json", { 
+    common_account = data.aws_organizations_account.devop.account_id
+    log_archieve= aws_organizations_account.Log_archive.id
+    security_audit= aws_organizations_account.Audit.id
+    kms_key_arn = aws_kms_key.lz_kms.arn
+    })
   version           = "4.0"
   remediation_types = ["INHERITANCE_DRIFT"]
 }
