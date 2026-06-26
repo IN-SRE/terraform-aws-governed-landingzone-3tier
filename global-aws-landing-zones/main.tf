@@ -6,13 +6,6 @@ resource "aws_organizations_organization" "main" {
   feature_set = "ALL"
 }
 
-# 
-import {
-  to = aws_organizations_organizational_unit.sandbox
-  identity = {
-    id = data.aws_organizations_organizational_unit.ou.id
-  }
-}
 
 resource "aws_organizations_organizational_unit" "sandbox" {
   name = "Sandbox"
@@ -168,3 +161,18 @@ resource "aws_iam_role_policy" "aws_controltower_stackset_role_policy" {
     ]
   })
 }
+
+################################################################################
+# Launch landing zone
+################################################################################
+
+resource "aws_controltower_landing_zone" "example" {
+  manifest_json     = templatefile("${path.module}/lz-gov-manifest.json", { common_account = data.aws_organizations_account.devop.account_id, log_archieve= aws_organizations_account.Log_archive.id, security_audit= aws_organizations_account.Audit.id})
+  version           = "4.0"
+  remediation_types = ["INHERITANCE_DRIFT"]
+}
+
+
+
+
+
