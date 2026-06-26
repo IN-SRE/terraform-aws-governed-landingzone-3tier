@@ -1,0 +1,53 @@
+
+{
+    "accessManagement": {
+        "enabled": true    
+    },
+    "backup": {
+        "enabled": true,   
+        "configurations": {
+            "backupAdmin": {
+                "accountId": "${common_account}"
+            },
+            "centralBackup": {
+                "accountId": "${common_account}"  
+            }
+            
+        }
+    },
+    "centralizedLogging": {
+        "accountId": "${log_archieve}",   
+        "enabled": true,             
+        "configurations": {
+            "accessLoggingBucket": {
+                "retentionDays": 365  
+            },  
+            "loggingBucket": {
+                "retentionDays": 365   
+            }
+        }
+    },
+    "config": {
+        "accountId": "${common_account}",    
+        "enabled": true,                
+        "configurations": {
+            "accessLoggingBucket": {
+                "retentionDays": 365  
+            },
+            "loggingBucket": {
+                "retentionDays": 365    
+            }
+           
+        }
+    },
+    "governedRegions": [               
+        "us-east-1",
+        "us-west-2"
+    ],
+    "securityRoles": {
+        "enabled": true,               
+        "accountId": "${security_audit}"   
+    }
+}
+    
+
