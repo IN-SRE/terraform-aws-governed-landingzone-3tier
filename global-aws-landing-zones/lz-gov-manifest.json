@@ -1,7 +1,7 @@
 
 {
     "accessManagement": {
-        "enabled": true    
+        "enabled": false    
     },
     "backup": {
         "enabled": false,   
@@ -11,8 +11,7 @@
             },
             "centralBackup": {
                 "accountId": "${common_account}"  
-            },
-             "kmsKeyArn": "${kms_key_arn}"
+            }   
             
         }
     },
@@ -25,12 +24,13 @@
             },  
             "loggingBucket": {
                 "retentionDays": 2
-            }
+            },
+            "kmsKeyArn": "${kms_key_arn}"
         }
     },
     "config": {
-        "accountId": "${common_account}",    
-        "enabled": true,                
+        "accountId": "${log_archieve}",    
+        "enabled": false,                
         "configurations": {
             "accessLoggingBucket": {
                 "retentionDays": 2 
@@ -46,7 +46,7 @@
         "us-west-2"
     ],
     "securityRoles": {
-        "enabled": true,               
+        "enabled": false,               
         "accountId": "${security_audit}"   
     }
 }
