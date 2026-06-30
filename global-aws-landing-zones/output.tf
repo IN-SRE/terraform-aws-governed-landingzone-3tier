@@ -15,3 +15,8 @@ output "sandbox_account_id" {
     value = data.aws_organizations_account.devop.account_id
   
 }
+
+output "x" {
+    value = aws_organizations_organization.main.accounts
+  
+}
