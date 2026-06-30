@@ -186,7 +186,7 @@ resource "aws_controltower_landing_zone" "lz" {
     })
   version           = "4.0"
   remediation_types = ["INHERITANCE_DRIFT"]
-  region = "us-east1, us-west-1"
+  region = "us-east-1"
   tags = local.common_tag
   
 }
