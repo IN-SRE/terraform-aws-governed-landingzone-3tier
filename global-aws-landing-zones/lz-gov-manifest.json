@@ -4,7 +4,7 @@
         "enabled": true    
     },
     "backup": {
-        "enabled": true,   
+        "enabled": false,   
         "configurations": {
             "backupAdmin": {
                 "accountId": "${common_account}"
@@ -21,10 +21,10 @@
         "enabled": true,             
         "configurations": {
             "accessLoggingBucket": {
-                "retentionDays": 365  
+                "retentionDays": 2 
             },  
             "loggingBucket": {
-                "retentionDays": 365   
+                "retentionDays": 2
             }
         }
     },
@@ -33,12 +33,11 @@
         "enabled": true,                
         "configurations": {
             "accessLoggingBucket": {
-                "retentionDays": 365  
+                "retentionDays": 2 
             },
             "loggingBucket": {
-                "retentionDays": 365    
-            },
-             "kmsKeyArn": "${kms_key_arn}"
+                "retentionDays": 2   
+            }
            
         }
     },
