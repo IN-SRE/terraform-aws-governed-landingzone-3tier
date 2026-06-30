@@ -46,7 +46,7 @@
         "us-west-2"
     ],
     "securityRoles": {
-        "enabled": true,               
+        "enabled": false,               
         "accountId": "${security_audit}"   
     }
 }
