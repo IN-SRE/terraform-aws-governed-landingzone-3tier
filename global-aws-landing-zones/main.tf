@@ -4,6 +4,12 @@ import {
 }
 resource "aws_organizations_organization" "main" {
   feature_set = "ALL"
+   lifecycle {
+    ignore_changes = [
+      aws_service_access_principals,
+      enabled_policy_types
+    ]
+  }
 }
 
 
