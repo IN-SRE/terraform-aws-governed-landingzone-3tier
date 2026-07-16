@@ -6,3 +6,5 @@ public_subnets = ["10.0.2.0/24"]
 azs = ["us-east-1a"]
 log_archive = "alz.aws.log@gmail.com"
 audit = "alz.aws.audit@gmail.com"
+terraform_version ="~>1.13.5"
+github_username = "IN-SRE"

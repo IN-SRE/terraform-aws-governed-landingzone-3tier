@@ -194,8 +194,8 @@ resource "aws_controltower_landing_zone" "lz" {
   remediation_types = ["INHERITANCE_DRIFT"]
   region = "us-east-1"
   tags = local.common_tag
-  
 }
+
 
 
 

@@ -68,3 +68,11 @@ variable "public_subnets" {
 variable "azs" {
   
 }
+
+################################################################################
+# AFT variables
+################################################################################
+variable "terraform_version" {}
+variable "github_username" {
+  
+}
