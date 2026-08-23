@@ -1,0 +1,70 @@
+name: "Workload CI - Plan"
+
+on:
+  pull_request:
+    paths: ["workloads/envs/**"]
+    
+# REQUIRED for OIDC authentication
+permissions:
+  id-token: write   # Required for requesting the JWT
+  contents: read    # Required for actions/checkout
+  pull-requests: write # Required if you want to post comments to PRs
+  
+jobs:
+  plan:
+    name: Plan ${{ matrix.env }}
+    strategy:
+      matrix:
+        env: [dev, stage, prod]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # 0. Authenticate to AWS using OIDC
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v5
+        with:
+          # Replace with your IAM Role ARN (e.g., from a GitHub Secret or variable)
+          role-to-assume: arn:aws:iam::630898854601:role/Workloadaws
+          aws-region: us-east-1 # Replace with your target region
+          
+      - name: Terraform install
+        uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: 1.13.5
+
+      # 1. Initialize with backend-config for the specific environment
+      - name: Terraform Init
+        working-directory: workloads/envs/${{ matrix.env }}
+        run: |
+          terraform init \
+          -backend-config="backend.config" \
+          -backend-config="key=workloads/${{ matrix.env }}/terraform.tfstate"
+
+      # 2. Plan with the specific .tfvars file
+      - name: Terraform Plan
+        id: plan
+        working-directory: workloads/envs/${{ matrix.env }}
+        run: |
+          terraform plan -no-color \
+            -var-file="${{ matrix.env }}.tfvars" \
+            -out=tfplan
+
+      # 3. Post plan output to PR Comment for easy review
+      - name: Post Plan to PR
+        uses: actions/github-script@v7
+        if: github.event_name == 'pull_request'
+        with:
+          script: |
+            const output = `#### Terraform Plan: ${{ matrix.env }} 📖
+            \`\`\`
+            ${process.env.PLAN}
+            \`\`\``;
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            })
+        env:
+          PLAN: "${{ steps.plan.outputs.stdout }}"
