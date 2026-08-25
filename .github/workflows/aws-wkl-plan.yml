@@ -1,9 +1,8 @@
-name: "AWS LZ Plan"
+name: "Workload CI - Plan"
 
 on:
   pull_request:
-    branches: [main]
-    paths: ["global-aws-landing-zones/**"]
+    paths: ["workloads/envs/**"]
     
 # REQUIRED for OIDC authentication
 permissions:
@@ -13,17 +12,20 @@ permissions:
   
 jobs:
   plan:
-    name: Plan aws-lz
+    name: Plan ${{ matrix.env }}
+    strategy:
+      matrix:
+        env: [dev, stage, prod]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v4
 
       # 0. Authenticate to AWS using OIDC
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v5
         with:
           # Replace with your IAM Role ARN (e.g., from a GitHub Secret or variable)
-          role-to-assume: arn:aws:iam::245111010647:role/github-terraform-dev-role
+          role-to-assume: arn:aws:iam::630898854601:role/Workloadaws
           aws-region: us-east-1 # Replace with your target region
           
       - name: Terraform install
@@ -33,18 +35,19 @@ jobs:
 
       # 1. Initialize with backend-config for the specific environment
       - name: Terraform Init
-        working-directory: global-aws-landing-zones
+        working-directory: workloads/envs/${{ matrix.env }}
         run: |
           terraform init \
           -backend-config="backend.config" \
-          -backend-config="key=aws-lz/terraform.tfstate"
+          -backend-config="key=workloads/${{ matrix.env }}/terraform.tfstate"
 
       # 2. Plan with the specific .tfvars file
       - name: Terraform Plan
         id: plan
-        working-directory: global-aws-landing-zones
+        working-directory: workloads/envs/${{ matrix.env }}
         run: |
           terraform plan -no-color \
+            -var-file="${{ matrix.env }}.tfvars" \
             -out=tfplan
 
       # 3. Post plan output to PR Comment for easy review
@@ -53,7 +56,7 @@ jobs:
         if: github.event_name == 'pull_request'
         with:
           script: |
-            const output = `#### Terraform Plan: aws-lz
+            const output = `#### Terraform Plan: ${{ matrix.env }} 📖
             \`\`\`
             ${process.env.PLAN}
             \`\`\``;
