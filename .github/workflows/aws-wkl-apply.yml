@@ -1,4 +1,4 @@
-name: tf aws apply
+name: Terraform AWS CD
 on:
   push:
     branches: [main]
@@ -13,9 +13,9 @@ jobs:
   deploy-dev:
     name: apply dev
     environment: dev
-    runs-on: ubantu-latest
+    runs-on: ubuntu-latest
     steps:
-      - name: Download github repo
+      - name: Checkout GitHub repository
         uses: actions/checkout@v5
 
       - name: Configure AWS credentials
@@ -57,13 +57,17 @@ jobs:
         uses: hashicorp/setup-terraform@v4
         with:
           terraform_version: 1.13.5
-      - name: Terraform Init & Apply
-        working-directory: envs/stage
+      - name: Terraform Init
+        working-directory: workloads/envs/stage
         run: |
           terraform init \
           -backend-config="backend.config" \
           -backend-config="key=workloads/stage/terraform.tfstate"
-          terraform apply -auto-approve -var-file="stage.tfvars"
+      
+      - name: Terraform Apply
+        working-directory: workloads/envs/stage
+        run: terraform apply -auto-approve -var-file="stage.tfvars"
+          
 
   deploy-prod:
     name: Apply Prod
@@ -84,9 +88,12 @@ jobs:
         with:
           terraform_version: 1.13.5
       - name: Terraform Init & Apply
-        working-directory: envs/prod
+        working-directory: workloads/envs/prod
         run: |
           terraform init \
           -backend-config="backend.config" \
           -backend-config="key=workloads/prod/terraform.tfstate"
-          terraform apply -auto-approve -var-file="prod.tfvars"       
+
+      - name: Terraform Apply
+        working-directory: workloads/envs/prod
+        run: terraform apply -auto-approve -var-file="prod.tfvars"     
