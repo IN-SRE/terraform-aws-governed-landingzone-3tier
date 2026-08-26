@@ -2,6 +2,7 @@ name: "Workload CI - Plan"
 
 on:
   pull_request:
+    branches: [main]
     paths: ["workloads/envs/**"]
     
 # REQUIRED for OIDC authentication

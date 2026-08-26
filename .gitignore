@@ -25,3 +25,4 @@ terraform.rc
 
 # AWS credentials
 .aws/
+global-aws-landing-zones
