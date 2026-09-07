@@ -1,0 +1,87 @@
+name: "aws-lz-state-rm-Manual"
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "Select Terraform action"
+        required: true
+        type: choice
+        options:
+          - state-rm
+          - destroy-all
+    
+      env:
+        description: "Environment"
+        required: true
+        type: choice
+        options:
+          - dev
+          - stage
+          - prod
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  terraform:
+    name: Terraform ${{ inputs.action }} - ${{ inputs.env }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v5
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v5
+        with:
+          # Dynamically assumes the correct role based on the selected environment input
+          role-to-assume: arn:aws:iam::630898854601:role/Workloadaws
+          aws-region: us-east-1
+
+      - name: Terraform Install
+        uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: 1.13.5
+
+      - name: Terraform init
+        working-directory: workloads/envs/${{ inputs.env }}
+        run: |
+          terraform init \
+          -backend-config="backend.config" \
+          -backend-config="key=workloads/${{ inputs.env }}/terraform.tfstate"
+
+      
+      - name: Validate Resource Address
+        if: inputs.action == 'state-rm'
+        working-directory: workloads/envs/${{ inputs.env }}
+        run: |
+          if [[ -z "${{ inputs.resource_address }}" ]]; then
+            echo "ERROR: resource_address is required for state-rm"
+            exit 1
+          fi
+
+      - name: Terraform State RM
+        if: inputs.action == 'state-rm'
+        working-directory: workloads/envs/${{ inputs.env }}
+        run: |
+          echo "Removing resource from Terraform state:"
+          echo "${{ inputs.resource_address }}"
+
+          terraform state rm "${{ inputs.resource_address }}"
+      
+
+
+      - name: Terraform Destroy Plan
+        if: inputs.action == 'destroy-all'
+        working-directory: workloads/envs/${{ inputs.env }}
+        run: |
+          terraform plan -destroy \
+            -out=destroy.tfplan
+
+      - name: Terraform Destroy
+        if: inputs.action == 'destroy-all'
+        working-directory: workloads/envs/${{ inputs.env }}
+        run: |
+          terraform apply -auto-approve destroy.tfplan
