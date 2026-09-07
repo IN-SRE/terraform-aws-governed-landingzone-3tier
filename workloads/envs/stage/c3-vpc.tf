@@ -1,6 +1,5 @@
 module "vpc-stage" {
-  source = "terraform-aws-modules/vpc/aws"
-  version = "6.6.0"
+   source = "git::https://github.com/IN-SRE/terraform-aws-infrastructure-modules.git//vpc?ref=v1.0.3"
    
     name = "${local.name}-vpc"
     cidr = var.cidr
