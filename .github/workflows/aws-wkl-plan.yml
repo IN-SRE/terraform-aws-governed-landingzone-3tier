@@ -13,7 +13,7 @@ permissions:
   
 jobs:
   plan:
-    name: Plan ${{ env.ENV_NAME }}
+    name: Plan ${{ github.base_ref == 'main' && 'prod' || github.base_ref }}
     env:
      ENV_NAME: ${{ github.base_ref == 'main' && 'prod' || github.base_ref }}
     
