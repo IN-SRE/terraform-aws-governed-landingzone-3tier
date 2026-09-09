@@ -16,7 +16,7 @@ variable "environment" {
 }
 
 variable "cidr" {
-    description = "hr-dev-vpc cidr"
+    description = "vpc-cidr"
     default = "10.1.0.0/16"
   
 }
