@@ -2,7 +2,7 @@ name: "Workload CI - Plan"
 
 on:
   pull_request:
-    branches: [main]
+    branches: [dev, stage, main]
     paths: ["workloads/envs/**"]
     
 # REQUIRED for OIDC authentication
@@ -13,10 +13,10 @@ permissions:
   
 jobs:
   plan:
-    name: Plan ${{ matrix.env }}
-    strategy:
-      matrix:
-        env: [dev, stage, prod]
+    name: Plan ${{ env.ENV_NAME }}
+    env:
+     ENV_NAME: ${{ github.base_ref == 'main' && 'prod' || github.base_ref }}
+    
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -26,7 +26,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v5
         with:
           # Replace with your IAM Role ARN (e.g., from a GitHub Secret or variable)
-          role-to-assume: arn:aws:iam::630898854601:role/Workloadaws
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: us-east-1 # Replace with your target region
           
       - name: Terraform install
@@ -36,19 +36,19 @@ jobs:
 
       # 1. Initialize with backend-config for the specific environment
       - name: Terraform Init
-        working-directory: workloads/envs/${{ matrix.env }}
+        working-directory: workloads/envs/${{ env.ENV_NAME }}
         run: |
           terraform init \
           -backend-config="backend.config" \
-          -backend-config="key=workloads/${{ matrix.env }}/terraform.tfstate"
+          -backend-config="key=workloads/${{ env.ENV_NAME }}/terraform.tfstate"
 
       # 2. Plan with the specific .tfvars file
       - name: Terraform Plan
         id: plan
-        working-directory: workloads/envs/${{ matrix.env }}
+        working-directory: workloads/envs/${{ env.ENV_NAME }}
         run: |
           terraform plan -no-color \
-            -var-file="${{ matrix.env }}.tfvars" \
+            -var-file="${{ env.ENV_NAME }}.tfvars" \
             -out=tfplan
 
       # 3. Post plan output to PR Comment for easy review
@@ -57,7 +57,7 @@ jobs:
         if: github.event_name == 'pull_request'
         with:
           script: |
-            const output = `#### Terraform Plan: ${{ matrix.env }} 📖
+            const output = `#### Terraform Plan: ${{ env.ENV_NAME }} 
             \`\`\`
             ${process.env.PLAN}
             \`\`\``;

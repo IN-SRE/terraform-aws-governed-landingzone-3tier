@@ -8,3 +8,4 @@ output "vpc_public_subnet_ip" {
 output "subnet_id" {
   value = module.vpc-dev.private_subnets
 }
+

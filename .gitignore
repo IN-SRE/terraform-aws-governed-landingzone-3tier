@@ -31,6 +31,4 @@ global-aws-landing-zones/
 # Testing files
 workloads/envs/dev/dev 
 
-c6*
-root*
-webserver.sh
+
