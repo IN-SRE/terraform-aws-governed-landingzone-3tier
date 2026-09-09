@@ -1,5 +1,5 @@
 module "private_ec2_asg" {
-  source =  "git::https://github.com/IN-SRE/terraform-aws-infrastructure-modules.git//tf-aws-ec2-autoscaling?ref=v2.0.1"
+  source =  "git::https://github.com/IN-SRE/terraform-aws-infrastructure-modules.git//tf-aws-ec2-autoscaling?ref=main"
   
   
   # Launch Template
@@ -71,7 +71,7 @@ module "private_ec2_asg" {
 ### Public EC2 Auto Scaling Group
 
 module "public_ec2_asg" {
-  source =  "git::https://github.com/IN-SRE/terraform-aws-infrastructure-modules.git//tf-aws-ec2-autoscaling?ref=v2.0.1"
+  source = "git::https://github.com/IN-SRE/terraform-aws-infrastructure-modules.git//tf-aws-ec2-autoscaling?ref=main"
   
   
   # Launch Template
@@ -80,6 +80,7 @@ module "public_ec2_asg" {
   key_name            = var.key_name
   security_group_ids  = [module.public_sg.security_group_id]
   user_data_path      = "${path.module}/webserver-02.sh"
+  public_ip           = true
   
   block_device_mappings = {
     root = {
@@ -90,6 +91,7 @@ module "public_ec2_asg" {
       encrypted             = true
     }
   }
+   
 
  
   # Auto Scaling Group
@@ -97,6 +99,8 @@ module "public_ec2_asg" {
   min_size              = 1
   max_size              = 2
   desired_capacity      = 1
+  
+  
 
    project = var.department
    environment = var.environment
