@@ -37,7 +37,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v5
         with:
           # Dynamically assumes the correct role based on the selected environment input
-          role-to-assume: arn:aws:iam::630898854601:role/Workloadaws
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: us-east-1
 
       - name: Terraform Install

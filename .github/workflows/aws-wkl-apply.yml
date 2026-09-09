@@ -1,7 +1,7 @@
 name: Terraform AWS CD
 on:
   push:
-    branches: [main]
+    branches: [dev, stage, main]
     paths: ["workloads/envs/**"]
 
 permissions:
@@ -10,9 +10,10 @@ permissions:
     
     
 jobs:
-  deploy-dev:
-    name: apply dev
-    environment: dev
+  deploy:
+    name: apply ${{ github.ref_name == 'main' && 'prod' || github.ref_name }}
+    env:
+      ENV_NAME: ${{ github.ref_name == 'main' && 'prod' || github.ref_name }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout GitHub repository
@@ -21,7 +22,7 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v5
         with:
-          role-to-assume: arn:aws:iam::630898854601:role/Workloadaws
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: us-east-1
 
       - name: Terraform install
@@ -29,71 +30,13 @@ jobs:
         with:
           terraform_version: 1.13.5
       - name: Terraform Init & Apply
-        working-directory: workloads/envs/dev
+        working-directory: workloads/envs/${{ env.ENV_NAME }}
         run: |
           terraform init \
           -backend-config="backend.config" \
-          -backend-config="key=workloads/dev/terraform.tfstate"
+          -backend-config="key=workloads/${{ env.ENV_NAME }}/terraform.tfstate"
           
       - name: Terraform Apply
-        working-directory: workloads/envs/dev
-        run: terraform apply -auto-approve -var-file="dev.tfvars"
+        working-directory: workloads/envs/${{ env.ENV_NAME }}
+        run: terraform apply -auto-approve -var-file="${{ env.ENV_NAME }}.tfvars"
 
-  deploy-stage:
-    name: Apply Stage
-    needs: deploy-dev   # <--- STOP CIRCUIT: Only runs if dev succeeds
-    environment: stage  # stop wait for QA lead approval
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v5
-        with:
-          role-to-assume: arn:aws:iam::630898854601:role/Workloadaws
-          aws-region: us-east-1
-          
-      - name: Terraform install
-        uses: hashicorp/setup-terraform@v4
-        with:
-          terraform_version: 1.13.5
-      - name: Terraform Init
-        working-directory: workloads/envs/stage
-        run: |
-          terraform init \
-          -backend-config="backend.config" \
-          -backend-config="key=workloads/stage/terraform.tfstate"
-      
-      - name: Terraform Apply
-        working-directory: workloads/envs/stage
-        run: terraform apply -auto-approve -var-file="stage.tfvars"
-          
-
-  deploy-prod:
-    name: Apply Prod
-    needs: deploy-stage # <--- FINAL GATE: Only reached if Dev, QA, and Stage pass
-    environment: prod   # Gated by Manual Approval in GitHub Settings
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v5
-        with:
-          role-to-assume: arn:aws:iam::630898854601:role/Workloadaws
-          aws-region: us-east-1
-          
-      - name: Terraform install
-        uses: hashicorp/setup-terraform@v4
-        with:
-          terraform_version: 1.13.5
-      - name: Terraform Init & Apply
-        working-directory: workloads/envs/prod
-        run: |
-          terraform init \
-          -backend-config="backend.config" \
-          -backend-config="key=workloads/prod/terraform.tfstate"
-
-      - name: Terraform Apply
-        working-directory: workloads/envs/prod
-        run: terraform apply -auto-approve -var-file="prod.tfvars"     
