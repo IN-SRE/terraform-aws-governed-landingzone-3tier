@@ -1,5 +1,5 @@
 # Generic Variables
 region = "us-east-1"  
-department = "Transportation"
+department = "HR"
 environment = "dev"
 
