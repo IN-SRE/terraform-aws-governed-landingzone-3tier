@@ -18,3 +18,10 @@ filter {
   }
   
 }
+
+
+# Data for domain name
+data "aws_route53_zone" "my_dns_zone" {
+  name         = "tomarinfralab.click"
+  private_zone = false
+}

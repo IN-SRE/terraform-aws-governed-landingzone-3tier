@@ -67,7 +67,7 @@ variable "db_subnets_names" {
 
 variable "instance_type" {
     description = "define instance type for hr-dev-vpc"
-    default = "t3.medium"
+    default = "t3.micro"
 }
 
 variable "key_name" {
@@ -115,4 +115,3 @@ variable "public_sg_name" {
     description = "it is for database cidr block for egress rule"
     default = "0.0.0.0/0"
   }
-

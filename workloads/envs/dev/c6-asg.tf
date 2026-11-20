@@ -1,5 +1,5 @@
-module "private_ec2_asg" {
-  source =  "git::https://github.com/IN-SRE/terraform-aws-infrastructure-modules.git//tf-aws-ec2-autoscaling?ref=main"
+module "private_ec2" {
+  source = "git::https://github.com/IN-SRE/terraform-aws-infrastructure-modules.git//tf-aws-ec2-autoscaling?ref=v2.0.2"
   
   
   # Launch Template
@@ -23,9 +23,9 @@ module "private_ec2_asg" {
   # Auto Scaling Group
   vpc_zone_identifiers = module.vpc-dev.private_subnets
   min_size              = 2
-  max_size              = 10
+  max_size              = 3
   desired_capacity      = 2
-
+  target_group_arns      = [module.alb.target_groups["mytg1"].arn]
   # SNS Notifications
   sns_subscription_emails  = ["inder0610@gmail.com"]
 
@@ -33,13 +33,13 @@ module "private_ec2_asg" {
   scheduled_actions = {
     scale-up-morning = {
       min_size         = 2
-      max_size         = 10
-      desired_capacity = 8
+      max_size         = 3
+      desired_capacity = 2
       recurrence       = "0 7 * * *"
     }
     scale-down-evening = {
       min_size         = 2
-      max_size         = 10
+      max_size         = 3
       desired_capacity = 2
       recurrence       = "0 17 * * *"
     }
@@ -50,11 +50,13 @@ module "private_ec2_asg" {
     cpu-target-tracking = {
       predefined_metric_type = "ASGAverageCPUUtilization"
       target_value            = 50.0
+       
     }
     alb-request-count = {
       predefined_metric_type   = "ALBRequestCountPerTarget"
       target_value              = 10.0
       estimated_instance_warmup = 120
+      resource_label            = "${module.alb.lb_arn_suffix}/${module.alb.target_group_arn_suffix["mytg1"]}"
     }
   }
 
@@ -70,8 +72,8 @@ module "private_ec2_asg" {
 
 ### Public EC2 Auto Scaling Group
 
-module "public_ec2_asg" {
-  source = "git::https://github.com/IN-SRE/terraform-aws-infrastructure-modules.git//tf-aws-ec2-autoscaling?ref=main"
+module "public_ec2" {
+  source = "git::https://github.com/IN-SRE/terraform-aws-infrastructure-modules.git//tf-aws-ec2-autoscaling?ref=v2.0.2"
   
   
   # Launch Template
