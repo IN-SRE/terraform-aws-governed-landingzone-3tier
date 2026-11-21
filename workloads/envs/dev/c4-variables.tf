@@ -115,3 +115,105 @@ variable "public_sg_name" {
     description = "it is for database cidr block for egress rule"
     default = "0.0.0.0/0"
   }
+
+
+
+####### CDN ######
+
+variable "cdn_enabled" {
+  description = "Enable CloudFront distribution"
+  type        = bool
+  default     = true
+}
+
+variable "cdn_is_ipv6_enabled" {
+  description = "Enable IPv6 for CloudFront"
+  type        = bool
+  default     = true
+}
+
+variable "cdn_aliases" {
+  description = "CloudFront alternate domain names"
+  type        = list(string)
+  default     = ["app.tomarinfralab.click"]
+}
+
+variable "cdn_origin_id" {
+  description = "CloudFront origin identifier"
+  type        = string
+  default     = "dev-alb-origin"
+}
+
+variable "cdn_origin_http_port" {
+  description = "Origin HTTP port"
+  type        = number
+  default     = 80
+}
+
+variable "cdn_origin_https_port" {
+  description = "Origin HTTPS port"
+  type        = number
+  default     = 443
+}
+
+variable "cdn_origin_protocol_policy" {
+  description = "Origin protocol policy"
+  type        = string
+  default     = "https-only"
+}
+
+variable "cdn_origin_ssl_protocols" {
+  description = "Supported SSL protocols for origin"
+  type        = list(string)
+  default     = ["TLSv1.2"]
+}
+
+variable "cdn_viewer_protocol_policy" {
+  description = "Viewer protocol policy"
+  type        = string
+  default     = "redirect-to-https"
+}
+
+variable "cdn_allowed_methods" {
+  description = "Allowed HTTP methods"
+  type        = list(string)
+  default     = [
+    "GET",
+    "HEAD",
+    "OPTIONS",
+    "PUT",
+    "POST",
+    "PATCH",
+    "DELETE"
+  ]
+}
+
+variable "cdn_cached_methods" {
+  description = "Cached HTTP methods"
+  type        = list(string)
+  default     = ["GET", "HEAD"]
+}
+
+variable "cdn_cache_policy_id" {
+  description = "CloudFront caching disabled policy ID"
+  type        = string
+  default     = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad"
+}
+
+variable "cdn_geo_restriction_type" {
+  description = "Geo restriction type"
+  type        = string
+  default     = "none"
+}
+
+variable "cdn_ssl_support_method" {
+  description = "SSL certificate support method"
+  type        = string
+  default     = "sni-only"
+}
+
+variable "cdn_minimum_protocol_version" {
+  description = "Minimum TLS protocol version"
+  type        = string
+  default     = "TLSv1.2_2021"
+}

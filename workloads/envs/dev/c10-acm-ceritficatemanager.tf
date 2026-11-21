@@ -14,7 +14,9 @@
   # Validation Method
   validation_method = "DNS"
   wait_for_validation = true  
-}
+ }
+
+
 
 # Output ACM Certificate ARN
 output "acm_certificate_arn" {

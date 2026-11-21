@@ -1,42 +1,69 @@
+
 name: Terraform AWS CD
+
 on:
   push:
-    branches: [dev, stage, main]
-    paths: ["workloads/envs/**"]
+    branches: [main]
+    paths:
+      - 'workloads/envs/**'
 
 permissions:
   id-token: write
   contents: read
-    
-    
+
 jobs:
-  deploy:
-    name: apply ${{ github.ref_name == 'main' && 'prod' || github.ref_name }}
-    env:
-      ENV_NAME: ${{ github.ref_name == 'main' && 'prod' || github.ref_name }}
+  changes:
+    name: Detect Dev Changes
     runs-on: ubuntu-latest
+    outputs:
+      dev: ${{ steps.filter.outputs.dev }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Detect Changes
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          base: ${{ github.event.before }}
+          filters: |
+            dev:
+              - 'workloads/envs/dev/**'
+
+  deploy:
+    name: Apply dev
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.dev == 'true'
+
+    env:
+      ENV_NAME: dev
+
     steps:
       - name: Checkout GitHub repository
         uses: actions/checkout@v5
 
-      - name: Configure AWS credentials
+      - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v5
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: us-east-1
 
-      - name: Terraform install
+      - name: Setup Terraform
         uses: hashicorp/setup-terraform@v4
         with:
           terraform_version: 1.13.5
-      - name: Terraform Init & Apply
+
+      - name: Terraform Init
         working-directory: workloads/envs/${{ env.ENV_NAME }}
         run: |
           terraform init \
-          -backend-config="backend.config" \
-          -backend-config="key=workloads/${{ env.ENV_NAME }}/terraform.tfstate"
-          
+            -backend-config=backend.config \
+            -backend-config=key=workloads/${{ env.ENV_NAME }}/terraform.tfstate
+
       - name: Terraform Apply
         working-directory: workloads/envs/${{ env.ENV_NAME }}
-        run: terraform apply -auto-approve -var-file="${{ env.ENV_NAME }}.tfvars"
-
+        run: |
+          terraform apply -auto-approve \
+            -var-file="${{ env.ENV_NAME }}.tfvars"
