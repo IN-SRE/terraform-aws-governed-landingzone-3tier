@@ -4,7 +4,7 @@ resource "aws_cloudfront_distribution" "cdn" {
   aliases         = var.cdn_aliases
 
   origin {
-    domain_name = module.alb.dns_name
+    domain_name = module.alb.alb_dns_name
     origin_id   = var.cdn_origin_id
 
     custom_origin_config {
