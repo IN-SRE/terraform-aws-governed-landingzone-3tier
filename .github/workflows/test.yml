@@ -1,0 +1,98 @@
+name: "Workload CI - Plan"
+
+on:
+  pull_request:
+    branches: [main]
+    paths: ["workloads/envs/**"]
+    
+# REQUIRED for OIDC authentication
+permissions:
+  id-token: write   # Required for requesting the JWT
+  contents: read    # Required for actions/checkout
+  pull-requests: write # Required if you want to post comments to PRs
+  
+jobs:
+  changes:
+    name: Detect Dev Changes
+    runs-on: ubuntu-latest
+    outputs:
+      dev: ${{ steps.filter.outputs.dev }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Detect Changes
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          base: main
+          filters: |
+            dev:
+              - 'workloads/envs/dev/**'
+
+  plan:
+    name: Plan dev
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.dev == 'true'
+
+    env:
+      ENV_NAME: dev
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Terraform Plan
+        run: |
+          echo "Running Terraform Plan for $ENV_NAME"
+
+      # 0. Authenticate to AWS using OIDC
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v5
+        with:
+          # Replace with your IAM Role ARN (e.g., from a GitHub Secret or variable)
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: us-east-1 # Replace with your target region
+          
+      - name: Terraform install
+        uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: 1.13.5
+
+      # 1. Initialize with backend-config for the specific environment
+      - name: Terraform Init
+        working-directory: workloads/envs/${{ env.ENV_NAME }}
+        run: |
+          terraform init \
+          -backend-config="backend.config" \
+          -backend-config="key=workloads/${{ env.ENV_NAME }}/terraform.tfstate"
+
+      # 2. Plan with the specific .tfvars file
+      - name: Terraform Plan
+        id: plan
+        working-directory: workloads/envs/${{ env.ENV_NAME }}
+        run: |
+          terraform plan -no-color \
+            -var-file="${{ env.ENV_NAME }}.tfvars" \
+            -out=tfplan
+
+      # 3. Post plan output to PR Comment for easy review
+      - name: Post Plan to PR
+        uses: actions/github-script@v7
+        if: github.event_name == 'pull_request'
+        with:
+          script: |
+            const output = `#### Terraform Plan: ${{ env.ENV_NAME }} 
+            \`\`\`
+            ${process.env.PLAN}
+            \`\`\``;
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            })
+        env:
+          PLAN: "${{ steps.plan.outputs.stdout }}"
