@@ -20,7 +20,7 @@ module "rdsdb" {
   port     = 3306
 
   db_subnet_group_name   = "DB-Group-${local.name}"
-  vpc_security_group_ids = [module.vpc-dev.vpc_id]
+  vpc_security_group_ids = [module.db_sg.security_group_id]
   multi_az               = false
 
   maintenance_window      = "Mon:00:00-Mon:03:00"
