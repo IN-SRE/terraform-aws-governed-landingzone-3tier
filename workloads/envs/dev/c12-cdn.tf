@@ -1,4 +1,4 @@
-resource "aws_cloudfront_distribution" "cdn" {
+/*resource "aws_cloudfront_distribution" "cdn" {
   enabled         = var.cdn_enabled
   is_ipv6_enabled = var.cdn_is_ipv6_enabled
   aliases         = var.cdn_aliases
@@ -36,4 +36,4 @@ resource "aws_cloudfront_distribution" "cdn" {
     ssl_support_method       = var.cdn_ssl_support_method
     minimum_protocol_version = var.cdn_minimum_protocol_version
   }
-}
+}*/

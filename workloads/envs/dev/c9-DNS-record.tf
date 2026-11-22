@@ -3,8 +3,8 @@ resource "aws_route53_record" "dns_record" {
     name    = "apps.tomarinfralab.click"
     type    = "A"
   alias {
-    name                   = aws_cloudfront_distribution.cdn.domain_name
-    zone_id                = aws_cloudfront_distribution.cdn.hosted_zone_id
+    name                   = module.alb.alb_dns_name    # aws_cloudfront_distribution.cdn.domain_name
+    zone_id                = module.alb.alb_zone_id     # aws_cloudfront_distribution.cdn.hosted_zone_id
     evaluate_target_health = true
   } 
 }
