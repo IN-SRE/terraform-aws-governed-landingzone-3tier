@@ -19,8 +19,8 @@ module "rdsdb" {
   password = "12345678"
   port     = 3306
 
-  db_subnet_group_name   = "dev-db-subnet-group"
-  vpc_security_group_ids = ["sg-0123456789abcdef0"]
+  db_subnet_group_name   = "DB-Group-${local.name}"
+  vpc_security_group_ids = [module.db_sg.security_group_id]
   multi_az               = false
 
   maintenance_window      = "Mon:00:00-Mon:03:00"
