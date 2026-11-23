@@ -7,7 +7,7 @@ module "alb" {
   subnets = module.vpc-dev.public_subnets
   security_group_ids = [ module.alb_sg.security_group_id ]
   enable_deletion_protection = false
-  idle_timeout = 60
+  idle_timeout = 70
   drop_invalid_header_fields = true
  #listeners 
   listeners = {
