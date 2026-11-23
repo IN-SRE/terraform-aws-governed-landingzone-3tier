@@ -108,7 +108,7 @@ jobs:
         working-directory: workloads/envs/${{ env.ENV_NAME }}
         run: |
           conftest test tfplan.json \
-            --policy "${GITHUB_WORKSPACE}/Policies/"
+            --policy "${GITHUB_WORKSPACE}/policies/"
 
             
 
