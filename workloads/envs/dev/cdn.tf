@@ -1,4 +1,6 @@
-/*resource "aws_cloudfront_distribution" "cdn" {
+/* AWS Free Tier: CDN approval is required, which is currently on hold.
+
+resource "aws_cloudfront_distribution" "cdn" {
   enabled         = var.cdn_enabled
   is_ipv6_enabled = var.cdn_is_ipv6_enabled
   aliases         = var.cdn_aliases

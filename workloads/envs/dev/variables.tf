@@ -217,3 +217,16 @@ variable "cdn_minimum_protocol_version" {
   type        = string
   default     = "TLSv1.2_2021"
 }
+
+##### Vault variables ######
+variable "vault_address" {
+  description = "HashiCorp Vault URL"
+  type        = string
+}
+
+
+variable "app_role_name" {
+  description = "IAM role used by application EC2"
+  type        = string
+  default     = "rdsdb-role"
+}
