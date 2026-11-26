@@ -222,6 +222,7 @@ variable "cdn_minimum_protocol_version" {
 variable "vault_address" {
   description = "HashiCorp Vault URL"
   type        = string
+  default     = "http://localhost:8200"
 }
 
 
