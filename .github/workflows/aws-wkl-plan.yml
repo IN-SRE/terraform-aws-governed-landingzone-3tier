@@ -108,7 +108,9 @@ jobs:
         working-directory: workloads/envs/${{ env.ENV_NAME }}
         run: |
           conftest test tfplan.json \
-            --policy ../../../Policies/
+            --policy "${GITHUB_WORKSPACE}/policies/"
+
+            
 
       # 4. Post plan output to PR Comment for easy review
       - name: Post Plan to PR

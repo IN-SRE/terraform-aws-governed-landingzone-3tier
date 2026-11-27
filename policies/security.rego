@@ -18,8 +18,6 @@ deny contains msg if {
     msg := "ALB HTTPS public access is missing or invalid"
 }
 
-package main
-
 deny contains msg if {
     some rc in input.resource_changes
     rc.type == "aws_security_group_rule"
