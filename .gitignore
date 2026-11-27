@@ -31,3 +31,4 @@ global-aws-landing-zones/
 # Testing files
 workloads/envs/dev/dev 
 
+.DS_Store
