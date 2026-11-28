@@ -13,13 +13,13 @@ module "observability" {
   alb_5xx_period             = 120
 
   # ASG
-  enable_asg_alarms        = true
-  autoscaling_group_name   = module.private_ec2.autoscaling_group_name
-  asg_scale_out_adjustment = 4
-  asg_scale_out_cooldown   = 300
-  asg_cpu_threshold        = 80
+  enable_asg_alarms          = true
+  autoscaling_group_name     = module.private_ec2.autoscaling_group_name
+  asg_scale_out_adjustment   = 4
+  asg_scale_out_cooldown     = 300
+  asg_cpu_threshold          = 80
   asg_cpu_evaluation_periods = 2
-  asg_cpu_period           = 120
+  asg_cpu_period             = 120
 
   # CIS
   enable_cis_alarms      = true

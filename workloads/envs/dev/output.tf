@@ -11,13 +11,13 @@ output "subnet_id" {
 
 
 output "dns_zoneid" {
-    value = data.aws_route53_zone.my_dns_zone.zone_id
-  
+  value = data.aws_route53_zone.my_dns_zone.zone_id
+
 }
 
 output "domainname" {
-    value = data.aws_route53_zone.my_dns_zone.name
-  
+  value = data.aws_route53_zone.my_dns_zone.name
+
 }
 output "autoscaling_group_name" {
   value = module.private_ec2.autoscaling_group_name
